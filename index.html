@@ -3,251 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Sustainability Calculator</title>
+    <title>Green Supplier Vendor Calculator</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #e8f5e9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 40px;
-            color: #333;
+            padding: 20px;
+            background-color: #e6f4ea;
+            color: #2d6a4f;
         }
-
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 100, 0, 0.1);
+        }
         h1 {
+            text-align: center;
+            color: #2d6a4f;
             font-size: 2.5em;
-            font-weight: bold;
-            color: #2E7D32;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .tab {
+            overflow: hidden;
+            border-bottom: 2px solid #74c69d;
             margin-bottom: 20px;
         }
-
+        .tab button {
+            background-color: #f0fff5;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 20px;
+            transition: 0.3s;
+            font-size: 1.1em;
+            color: #2d6a4f;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+        .tab button:hover {
+            background-color: #d8f3dc;
+        }
+        .tab button.active {
+            background-color: #40916c;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #74c69d;
+            border-radius: 0 0 8px 8px;
+            background-color: #f0fff5;
+        }
+        h3 {
+            color: #40916c;
+            border-bottom: 2px solid #74c69d;
+            padding-bottom: 5px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
         label {
             display: block;
-            font-size: 1em;
-            font-weight: 500;
-            color: #333;
             margin-bottom: 8px;
+            font-weight: bold;
+            color: #2d6a4f;
         }
-
-        input[type="number"], input[type="text"], select {
+        input, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            color: #333;
-            background-color: #f9f9f9;
-            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #74c69d;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #ffffff;
         }
-
-        button {
-            background-color: #2E7D32;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: block;
-            margin: 20px auto;
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #74c69d;
+            border-radius: 5px;
+            background-color: #ffffff;
         }
-
-        button:hover {
-            background-color: #1B5E20;
+        .checkbox-group label {
+            margin: 5px 0;
+            font-weight: normal;
         }
-
-        #results {
+        #formalSubTypeContainer, #informalSubTypeContainer {
             display: none;
+        }
+        #formalResult, #informalResult {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #f0fff5;
+            border: 2px solid #74c69d;
+        }
+        .green { background-color: #d8f3dc; color: #2d6a4f; }
+        .yellow { background-color: #fff3cd; color: #856404; }
+        .red { background-color: #f8d7da; color: #721c24; }
+        .button-group {
+            text-align: center;
             margin-top: 20px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        .result-item {
-            margin-bottom: 10px;
-        }
-
-        .green {
-            background-color: #2E7D32;
+        button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            background-color: #40916c;
             color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
         }
-
-        .yellow {
-            background-color: #FBC02D;
-            color: black;
+        button:hover {
+            background-color: #2d6a4f;
         }
-
-        .red {
-            background-color: #D32F2F;
-            color: white;
+        .weightage {
+            font-size: 0.9em;
+            color: #52796f;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Vendor Sustainability Calculator</h1>
+    <div class="container">
+        <h1>Green Supplier Vendor Calculator</h1>
 
-    <div>
-        <label>Supplier Name:</label>
-        <input type="text" id="supplier-name" placeholder="e.g., Supplier A">
-    </div>
-    <div>
-        <label>Supplier Location:</label>
-        <input type="text" id="supplier-location" placeholder="e.g., Mumbai, India">
-    </div>
+        <!-- Tabs -->
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Formal')" id="defaultOpen">Formal Suppliers</button>
+            <button class="tablinks" onclick="openTab(event, 'Informal')">Informal Artisans</button>
+        </div>
 
-    <!-- Choose Material Type (Fabric or Trim) -->
-    <div>
-        <label>Material Type:</label>
-        <select id="material-type" onchange="updateMaterialOptions()">
-            <option value="">-- Select Material Type --</option>
-            <option value="Fabric">Fabric</option>
-            <option value="Trim">Trim</option>
-        </select>
-    </div>
+        <!-- Formal Suppliers Tab -->
+        <div id="Formal" class="tabcontent">
+            <div class="form-group">
+                <label for="formalSupplierName">Supplier Name:</label>
+                <input type="text" id="formalSupplierName" placeholder="Enter supplier name">
+            </div>
+            <div class="form-group">
+                <label for="formalSupplierLocation">Supplier Location:</label>
+                <input type="text" id="formalSupplierLocation" placeholder="Enter supplier location">
+            </div>
+            <div class="form-group">
+                <label for="formalSupplierType">Supplier Type:</label>
+                <select id="formalSupplierType" onchange="toggleFormalSubType()">
+                    <option value="">Select Type</option>
+                    <option value="fabric">Fabric</option>
+                    <option value="trim">Trim</option>
+                </select>
+            </div>
+            <div class="form-group" id="formalSubTypeContainer">
+                <label for="formalSubType">Type:</label>
+                <select id="formalSubType"></select>
+            </div>
 
-    <!-- Fabric Options -->
-    <div id="fabric-options" style="display: none;">
-        <label>Choose Fabric Type:</label>
-        <select id="fabric-type">
-            <option value="">-- Select Fabric Type --</option>
-            <option value="Cotton">Cotton</option>
-            <option value="Linen">Linen</option>
-            <option value="Silk">Silk</option>
-            <option value="Wool">Wool</option>
-            <option value="Polyester">Polyester</option>
-        </select>
-    </div>
+            <h3>Quality (C1) <span class="weightage">Weight: 25%</span></h3>
+            <div class="form-group">
+                <label for="formalDefectRate">Defect Rate (%):</label>
+                <input type="number" id="formalDefectRate" min="0" max="100" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="formalRejectionRate">Rejection Rate (%):</label>
+                <input type="number" id="formalRejectionRate" min="0" max="100" step="0.1">
+            </div>
 
-    <!-- Trim Options -->
-    <div id="trim-options" style="display: none;">
-        <label>Choose Trim Type:</label>
-        <select id="trim-type">
-            <option value="">-- Select Trim Type --</option>
-            <option value="Buttons">Buttons</option>
-            <option value="Zippers">Zippers</option>
-            <option value="Laces">Laces</option>
-            <option value="Labels">Labels</option>
-        </select>
-    </div>
+            <h3>Cost (C2) <span class="weightage">Weight: 20%</span></h3>
+            <div class="form-group">
+                <label for="formalProductCost">Product Cost (₹):</label>
+                <input type="number" id="formalProductCost" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="formalTransportCost">Transportation Cost (₹):</label>
+                <input type="number" id="formalTransportCost" min="0" step="1">
+            </div>
 
-    <!-- Quality (C1) -->
-    <div>
-        <label>Defect Rate (%):</label>
-        <input type="number" id="c11" placeholder="e.g., 3">
-    </div>
-    <div>
-        <label>Rejection Rate (%):</label>
-        <input type="number" id="c12" placeholder="e.g., 5">
-    </div>
+            <h3>Delivery (C3) <span class="weightage">Weight: 20%</span></h3>
+            <div class="form-group">
+                <label for="formalLeadTime">Lead Time (days):</label>
+                <input type="number" id="formalLeadTime" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="formalFulfillmentRate">Order Fulfillment Rate (%):</label>
+                <input type="number" id="formalFulfillmentRate" min="0" max="100" step="0.1">
+            </div>
 
-    <!-- Cost (C2) -->
-    <div>
-        <label>Product Cost (₹):</label>
-        <input type="number" id="c21" placeholder="e.g., 300000">
-    </div>
-    <div>
-        <label>Transportation Cost (₹):</label>
-        <input type="number" id="c22" placeholder="e.g., 8000">
-    </div>
+            <h3>Service (C4) <span class="weightage">Weight: 15%</span></h3>
+            <div class="form-group">
+                <label for="formalCustomerService">Customer Service Rating (1-10):</label>
+                <input type="number" id="formalCustomerService" min="1" max="10" step="1">
+            </div>
+            <div class="form-group">
+                <label for="formalCsr">Social Service (CSR) Contribution (%):</label>
+                <input type="number" id="formalCsr" min="0" max="100" step="0.1">
+            </div>
 
-    <!-- Delivery (C3) -->
-    <div>
-        <label>Lead Time (Days):</label>
-        <input type="number" id="c31" placeholder="e.g., 15">
-    </div>
-    <div>
-        <label>Order Fulfillment Rate (%):</label>
-        <input type="number" id="c32" placeholder="e.g., 95">
-    </div>
+            <h3>Environmental Competency (C5) <span class="weightage">Weight: 20%</span></h3>
+            <div class="form-group">
+                <label for="formalEmissions">CO₂ Emissions (Tons):</label>
+                <input type="number" id="formalEmissions" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Certifications:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="formalCertifications" value="GOTS"> GOTS (1.75)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="Higg FEM"> Higg FEM (1.40)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="Higg FSLM"> Higg FSLM (1.40)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="ZDHC"> ZDHC (1.05)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="Fair Trade"> Fair Trade (0.70)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="BCI"> BCI (0.35)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="ISO 14001"> ISO 14001 (0.21)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="Organic Content Standard"> Organic Content Standard (0.14)</label>
+                    <label><input type="checkbox" name="formalCertifications" value="No Certifications"> No Certifications (0.00)</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Sustainable Practices:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="formalPractices" value="Renewable Energy"> Renewable Energy (2.0)</label>
+                    <label><input type="checkbox" name="formalPractices" value="Water Recycling"> Water Recycling (1.5)</label>
+                    <label><input type="checkbox" name="formalPractices" value="Waste Reduction"> Waste Reduction (1.2)</label>
+                    <label><input type="checkbox" name="formalPractices" value="Sustainable Packaging"> Sustainable Packaging (0.9)</label>
+                    <label><input type="checkbox" name="formalPractices" value="Employee Training"> Employee Training (0.6)</label>
+                    <label><input type="checkbox" name="formalPractices" value="Local Sourcing"> Local Sourcing (0.3)</label>
+                    <label><input type="checkbox" name="formalPractices" value="None"> None (0.0)</label>
+                </div>
+            </div>
 
-    <!-- Service (C4) -->
-    <div>
-        <label>Customer Service Rating (1-10):</label>
-        <input type="number" id="c41" min="1" max="10" placeholder="e.g., 8">
-    </div>
-    <div>
-        <label>CSR Contribution (%):</label>
-        <input type="number" id="c42" placeholder="e.g., 50">
-    </div>
+            <div class="button-group">
+                <button onclick="calculateFormalScore()">Calculate Score</button>
+                <button onclick="resetFormalForm()">Reset Form</button>
+            </div>
+            <div id="formalResult"></div>
+        </div>
 
-    <!-- Environmental Competency (C5) -->
-    <div>
-        <label>Emissions (Tons CO₂):</label>
-        <input type="number" id="c51" placeholder="e.g., 100">
-    </div>
-    <div>
-        <label>Number of Certifications:</label>
-        <input type="number" id="c52" placeholder="e.g., 3">
-    </div>
-    <div>
-        <label>Pollution Control Units:</label>
-        <input type="number" id="c53" placeholder="e.g., 30">
-    </div>
+        <!-- Informal Artisans Tab -->
+        <div id="Informal" class="tabcontent">
+            <div class="form-group">
+                <label for="informalSupplierName">Artisan Name:</label>
+                <input type="text" id="informalSupplierName" placeholder="Enter artisan name">
+            </div>
+            <div class="form-group">
+                <label for="informalSupplierLocation">Artisan Location:</label>
+                <input type="text" id="informalSupplierLocation" placeholder="Enter artisan location">
+            </div>
+            <div class="form-group">
+                <label for="informalSupplierType">Craft Type:</label>
+                <select id="informalSupplierType" onchange="toggleInformalSubType()">
+                    <option value="">Select Craft</option>
+                    <option value="weaving">Weaving</option>
+                    <option value="embroidery">Embroidery</option>
+                    <option value="pottery">Pottery</option>
+                </select>
+            </div>
+            <div class="form-group" id="informalSubTypeContainer">
+                <label for="informalSubType">Specific Craft:</label>
+                <select id="informalSubType"></select>
+            </div>
 
-    <button onclick="calculateVendorScore()">Calculate & Save</button>
+            <h3>Craftsmanship Quality (C1) <span class="weightage">Weight: 30%</span></h3>
+            <div class="form-group">
+                <label for="informalCraftQuality">Craft Quality Rating (1-10):</label>
+                <input type="number" id="informalCraftQuality" min="1" max="10" step="1">
+            </div>
+            <div class="form-group">
+                <label for="informalConsistency">Consistency Rating (1-10):</label>
+                <input type="number" id="informalConsistency" min="1" max="10" step="1">
+            </div>
 
-    <!-- Results Display -->
-    <div id="results">
-        <div class="result-item" id="total-score"></div>
-        <div class="result-item" id="c1-result"></div>
-        <div class="result-item" id="c2-result"></div>
-        <div class="result-item" id="c3-result"></div>
-        <div class="result-item" id="c4-result"></div>
-        <div class="result-item" id="c5-result"></div>
+            <h3>Cost (C2) <span class="weightage">Weight: 20%</span></h3>
+            <div class="form-group">
+                <label for="informalProductCost">Product Cost (₹):</label>
+                <input type="number" id="informalProductCost" min="0" step="1">
+            </div>
+
+            <h3>Delivery (C3) <span class="weightage">Weight: 20%</span></h3>
+            <div class="form-group">
+                <label for="informalLeadTime">Lead Time (days):</label>
+                <input type="number" id="informalLeadTime" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="informalReliability">Delivery Reliability Rating (1-10):</label>
+                <input type="number" id="informalReliability" min="1" max="10" step="1">
+            </div>
+
+            <h3>Community Impact (C4) <span class="weightage">Weight: 15%</span></h3>
+            <div class="form-group">
+                <label for="informalCommunitySupport">Community Support Rating (1-10):</label>
+                <input type="number" id="informalCommunitySupport" min="1" max="10" step="1">
+            </div>
+            <div class="form-group">
+                <label for="informalEmployment">Local Employment Impact (1-10):</label>
+                <input type="number" id="informalEmployment" min="1" max="10" step="1">
+            </div>
+
+            <h3>Environmental Sustainability (C5) <span class="weightage">Weight: 15%</span></h3>
+            <div class="form-group">
+                <label for="informalMaterialSource">Material Source Sustainability (1-10):</label>
+                <input type="number" id="informalMaterialSource" min="1" max="10" step="1">
+            </div>
+            <div class="form-group">
+                <label>Sustainable Practices:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="informalPractices" value="Handmade"> Handmade (1.0)</label>
+                    <label><input type="checkbox" name="informalPractices" value="Natural Dyes"> Natural Dyes (0.8)</label>
+                    <label><input type="checkbox" name="informalPractices" value="Local Materials"> Local Materials (0.6)</label>
+                    <label><input type="checkbox" name="informalPractices" value="Low Waste"> Low Waste (0.4)</label>
+                    <label><input type="checkbox" name="informalPractices" value="None"> None (0.0)</label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button onclick="calculateInformalScore()">Calculate Score</button>
+                <button onclick="resetInformalForm()">Reset Form</button>
+            </div>
+            <div id="informalResult"></div>
+        </div>
     </div>
 
     <script>
-        function updateMaterialOptions() {
-            const materialType = document.getElementById('material-type').value;
-            if (materialType === "Fabric") {
-                document.getElementById('fabric-options').style.display = 'block';
-                document.getElementById('trim-options').style.display = 'none';
-            } else if (materialType === "Trim") {
-                document.getElementById('trim-options').style.display = 'block';
-                document.getElementById('fabric-options').style.display = 'none';
+        // Formal Types
+        const fabricTypes = ['Cotton', 'Polyester', 'Silk', 'Wool', 'Linen', 'Denim', 'Rayon', 'Velvet'];
+        const trimTypes = ['Buttons', 'Zippers', 'Threads', 'Labels', 'Elastic', 'Beads', 'Lace', 'Ribbons'];
+
+        // Informal Types
+        const weavingTypes = ['Handloom', 'Powerloom', 'Knitting', 'Crochet'];
+        const embroideryTypes = ['Hand Embroidery', 'Machine Embroidery', 'Appliqué', 'Cross-Stitch'];
+        const potteryTypes = ['Earthenware', 'Stoneware', 'Porcelain'];
+
+        // Formal Weightages
+        const formalCertificationWeights = {
+            'GOTS': 1.75, 'Higg FEM': 1.40, 'Higg FSLM': 1.40, 'ZDHC': 1.05, 'Fair Trade': 0.70,
+            'BCI': 0.35, 'ISO 14001': 0.21, 'Organic Content Standard': 0.14, 'No Certifications': 0.00
+        };
+        const formalPracticeWeights = {
+            'Renewable Energy': 2.0, 'Water Recycling': 1.5, 'Waste Reduction': 1.2, 'Sustainable Packaging': 0.9,
+            'Employee Training': 0.6, 'Local Sourcing': 0.3, 'None': 0.0
+        };
+        const formalCriteriaWeights = {
+            c1: 0.25, c2: 0.20, c3: 0.20, c4: 0.15, c5: 0.20
+        };
+
+        // Informal Weightages
+        const informalPracticeWeights = {
+            'Handmade': 1.0, 'Natural Dyes': 0.8, 'Local Materials': 0.6, 'Low Waste': 0.4, 'None': 0.0
+        };
+        const informalCriteriaWeights = {
+            c1: 0.30, c2: 0.20, c3: 0.20, c4: 0.15, c5: 0.15
+        };
+
+        // Tab Functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        document.getElementById("defaultOpen").click(); // Open Formal tab by default
+
+        // Toggle Sub-Types
+        function toggleFormalSubType() {
+            const supplierType = document.getElementById('formalSupplierType').value;
+            const subTypeContainer = document.getElementById('formalSubTypeContainer');
+            const subTypeSelect = document.getElementById('formalSubType');
+
+            subTypeSelect.innerHTML = '<option value="">Select Sub-Type</option>';
+            if (supplierType === 'fabric') {
+                fabricTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+                subTypeContainer.style.display = 'block';
+            } else if (supplierType === 'trim') {
+                trimTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+                subTypeContainer.style.display = 'block';
             } else {
-                document.getElementById('fabric-options').style.display = 'none';
-                document.getElementById('trim-options').style.display = 'none';
+                subTypeContainer.style.display = 'none';
             }
         }
 
-        function calculateVendorScore() {
-            // Get input values
-            const c11 = parseFloat(document.getElementById('c11').value);
-            const c12 = parseFloat(document.getElementById('c12').value);
-            const c21 = parseFloat(document.getElementById('c21').value);
-            const c22 = parseFloat(document.getElementById('c22').value);
-            const c31 = parseFloat(document.getElementById('c31').value);
-            const c32 = parseFloat(document.getElementById('c32').value);
-            const c41 = parseFloat(document.getElementById('c41').value);
-            const c42 = parseFloat(document.getElementById('c42').value);
-            const c51 = parseFloat(document.getElementById('c51').value);
-            const c52 = parseFloat(document.getElementById('c52').value);
-            const c53 = parseFloat(document.getElementById('c53').value);
+        function toggleInformalSubType() {
+            const supplierType = document.getElementById('informalSupplierType').value;
+            const subTypeContainer = document.getElementById('informalSubTypeContainer');
+            const subTypeSelect = document.getElementById('informalSubType');
 
-            // Calculate scores based on formulas
-            const c1_score = 1 + (c11 / 10) + 1 + (c12 / 10); // Quality (C1)
-            const c2_score = (1 + 9 * (c21 - 100000) / (500000 - 100000)) + (1 + 9 * (c22 - 5000) / (15000 - 5000)); // Cost (C2)
-            const c3_score = (1 + 9 * (c31 - 5) / (30 - 5)) + (11 - (c32 / 10)); // Delivery (C3)
-            const c4_score = 11 - c41 + 10 - (c42 / 10); // Service (C4)
-            const c5_score = (1 + 9 * (c51 - 50) / (200 - 50)) + (10 - (c52 * 2)) + (1 + 9 * (c53 - 10) / (100 - 10)); // Environmental Competency (C5)
+            subTypeSelect.innerHTML = '<option value="">Select Specific Craft</option>';
+            if (supplierType === 'weaving') {
+                weavingTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+                subTypeContainer.style.display = 'block';
+            } else if (supplierType === 'embroidery') {
+                embroideryTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+                subTypeContainer.style.display = 'block';
+            } else if (supplierType === 'pottery') {
+                potteryTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+                subTypeContainer.style.display = 'block';
+            } else {
+                subTypeContainer.style.display = 'none';
+            }
+        }
 
-            // Calculate total score
-            const total_score = c1_score + c2_score + c3_score + c4_score + c5_score;
+        // Formal Score Calculation
+        function calculateFormalScore() {
+            const defectRate = parseFloat(document.getElementById('formalDefectRate').value) || 0;
+            const rejectionRate = parseFloat(document.getElementById('formalRejectionRate').value) || 0;
+            const productCost = parseFloat(document.getElementById('formalProductCost').value) || 0;
+            const transportCost = parseFloat(document.getElementById('formalTransportCost').value) || 0;
+            const leadTime = parseFloat(document.getElementById('formalLeadTime').value) || 0;
+            const fulfillmentRate = parseFloat(document.getElementById('formalFulfillmentRate').value) || 0;
+            const customerService = parseFloat(document.getElementById('formalCustomerService').value) || 0;
+            const csr = parseFloat(document.getElementById('formalCsr').value) || 0;
+            const emissions = parseFloat(document.getElementById('formalEmissions').value) || 0;
+            const selectedCertifications = Array.from(document.querySelectorAll('input[name="formalCertifications"]:checked')).map(input => input.value);
+            const selectedPractices = Array.from(document.querySelectorAll('input[name="formalPractices"]:checked')).map(input => input.value);
 
-            // Display results
-            document.getElementById('total-score').innerHTML = `Total Score: ${total_score.toFixed(2)}`;
-            document.getElementById('c1-result').innerHTML = `Quality Score (C1): ${c1_score.toFixed(2)}`;
-            document.getElementById('c2-result').innerHTML = `Cost Score (C2): ${c2_score.toFixed(2)}`;
-            document.getElementById('c3-result').innerHTML = `Delivery Score (C3): ${c3_score.toFixed(2)}`;
-            document.getElementById('c4-result').innerHTML = `Service Score (C4): ${c4_score.toFixed(2)}`;
-            document.getElementById('c5-result').innerHTML = `Environmental Competency Score (C5): ${c5_score.toFixed(2)}`;
+            const minMax = {
+                productCost: { min: 1000, max: 50000 },
+                transportCost: { min: 500, max: 20000 },
+                leadTime: { min: 5, max: 60 },
+                emissions: { min: 10, max: 500 }
+            };
 
-            // Show results
-            document.getElementById('results').style.display = 'block';
+            const c1Raw = (Math.min(10, Math.round(1 + (defectRate / 10))) + Math.min(10, Math.round(1 + (rejectionRate / 10)))) / 2;
+            const c2Raw = (Math.min(10, Math.round(1 + 9 * ((productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min)))) + 
+                           Math.min(10, Math.round(1 + 9 * ((transportCost - minMax.transportCost.min) / (minMax.transportCost.max - minMax.transportCost.min))))) / 2;
+            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
+                           Math.round(11 - (fulfillmentRate / 10))) / 2;
+            const c4Raw = (Math.round(11 - customerService) + Math.min(10, Math.round(10 - (csr / 10)))) / 2;
+            const c51 = Math.min(10, Math.round(1 + 9 * ((emissions - minMax.emissions.min) / (minMax.emissions.max - minMax.emissions.min))));
+            const c52 = selectedCertifications.includes('No Certifications') || selectedCertifications.length === 0 ? 10 : Math.max(1, 10 - selectedCertifications.reduce((sum, cert) => sum + (formalCertificationWeights[cert] || 0), 0));
+            const c53 = selectedPractices.includes('None') || selectedPractices.length === 0 ? 10 : Math.max(1, 10 - selectedPractices.reduce((sum, practice) => sum + (formalPracticeWeights[practice] || 0), 0));
+            const c5Raw = (c51 + c52 + c53) / 3;
+
+            const totalScoreRaw = (c1Raw * formalCriteriaWeights.c1) + (c2Raw * formalCriteriaWeights.c2) + (c3Raw * formalCriteriaWeights.c3) + (c4Raw * formalCriteriaWeights.c4) + (c5Raw * formalCriteriaWeights.c5);
+            const totalScore = Math.max(1, Math.min(10, totalScoreRaw));
+
+            const resultDiv = document.getElementById('formalResult');
+            let colorClass = '', assessment = '';
+            if (totalScore <= 3.33) {
+                colorClass = 'green';
+                assessment = 'Good Supplier - Recommended';
+            } else if (totalScore <= 6.66) {
+                colorClass = 'yellow';
+                assessment = 'Average Supplier - Consider with Caution';
+            } else {
+                colorClass = 'red';
+                assessment = 'Poor Supplier - Not Recommended';
+            }
+
+            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
+            resultDiv.className = 'result ' + colorClass;
+            resultDiv.style.display = 'block';
+        }
+
+        // Informal Score Calculation
+        function calculateInformalScore() {
+            const craftQuality = parseFloat(document.getElementById('informalCraftQuality').value) || 0;
+            const consistency = parseFloat(document.getElementById('informalConsistency').value) || 0;
+            const productCost = parseFloat(document.getElementById('informalProductCost').value) || 0;
+            const leadTime = parseFloat(document.getElementById('informalLeadTime').value) || 0;
+            const reliability = parseFloat(document.getElementById('informalReliability').value) || 0;
+            const communitySupport = parseFloat(document.getElementById('informalCommunitySupport').value) || 0;
+            const employment = parseFloat(document.getElementById('informalEmployment').value) || 0;
+            const materialSource = parseFloat(document.getElementById('informalMaterialSource').value) || 0;
+            const selectedPractices = Array.from(document.querySelectorAll('input[name="informalPractices"]:checked')).map(input => input.value);
+
+            const minMax = {
+                productCost: { min: 100, max: 5000 },
+                leadTime: { min: 1, max: 30 }
+            };
+
+            const c1Raw = (Math.round(11 - craftQuality) + Math.round(11 - consistency)) / 2;
+            const c2Raw = Math.min(10, Math.round(1 + 9 * ((productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min))));
+            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
+                           Math.round(11 - reliability)) / 2;
+            const c4Raw = (Math.round(11 - communitySupport) + Math.round(11 - employment)) / 2;
+            const c51 = Math.round(11 - materialSource);
+            const c52 = selectedPractices.includes('None') || selectedPractices.length === 0 ? 10 : Math.max(1, 10 - selectedPractices.reduce((sum, practice) => sum + (informalPracticeWeights[practice] || 0), 0));
+            const c5Raw = (c51 + c52) / 2;
+
+            const totalScoreRaw = (c1Raw * informalCriteriaWeights.c1) + (c2Raw * informalCriteriaWeights.c2) + (c3Raw * informalCriteriaWeights.c3) + (c4Raw * informalCriteriaWeights.c4) + (c5Raw * informalCriteriaWeights.c5);
+            const totalScore = Math.max(1, Math.min(10, totalScoreRaw));
+
+            const resultDiv = document.getElementById('informalResult');
+            let colorClass = '', assessment = '';
+            if (totalScore <= 3.33) {
+                colorClass = 'green';
+                assessment = 'Good Artisan - Recommended';
+            } else if (totalScore <= 6.66) {
+                colorClass = 'yellow';
+                assessment = 'Average Artisan - Consider with Caution';
+            } else {
+                colorClass = 'red';
+                assessment = 'Poor Artisan - Not Recommended';
+            }
+
+            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
+            resultDiv.className = 'result ' + colorClass;
+            resultDiv.style.display = 'block';
+        }
+
+        // Reset Functions
+        function resetFormalForm() {
+            document.getElementById('Formal').querySelectorAll('input, select').forEach(input => input.value = '');
+            document.getElementById('formalSubTypeContainer').style.display = 'none';
+            document.querySelectorAll('input[name="formalCertifications"], input[name="formalPractices"]').forEach(checkbox => checkbox.checked = false);
+            const resultDiv = document.getElementById('formalResult');
+            if (resultDiv) {
+                resultDiv.innerHTML = '';
+                resultDiv.className = 'result';
+            }
+        }
+
+        function resetInformalForm() {
+            document.getElementById('Informal').querySelectorAll('input, select').forEach(input => input.value = '');
+            document.getElementById('informalSubTypeContainer').style.display = 'none';
+            document.querySelectorAll('input[name="informalPractices"]').forEach(checkbox => checkbox.checked = false);
+            const resultDiv = document.getElementById('informalResult');
+            if (resultDiv) {
+                resultDiv.innerHTML = '';
+                resultDiv.className = 'result';
+            }
         }
     </script>
 </body>
