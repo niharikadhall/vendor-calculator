@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supplier Sustainability Calculator</title>
+    <title>Vendor Sustainability Calculator</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            background-color: #e8f5e9;
             margin: 0;
             padding: 40px;
             color: #333;
@@ -17,6 +17,7 @@
             font-size: 2.5em;
             font-weight: bold;
             color: #2E7D32;
+            margin-bottom: 20px;
         }
 
         label {
@@ -27,7 +28,7 @@
             margin-bottom: 8px;
         }
 
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -68,107 +69,142 @@
         .result-item {
             margin-bottom: 10px;
         }
+
+        .green {
+            background-color: #2E7D32;
+            color: white;
+        }
+
+        .yellow {
+            background-color: #FBC02D;
+            color: black;
+        }
+
+        .red {
+            background-color: #D32F2F;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h1>Supplier Sustainability Calculator</h1>
+    <h1>Vendor Sustainability Calculator</h1>
 
     <div>
         <label>Supplier Name:</label>
         <input type="text" id="supplier-name" placeholder="e.g., Supplier A">
     </div>
     <div>
-        <label>Energy Consumption (kWh):</label>
-        <input type="number" id="energy" placeholder="e.g., 4000">
-    </div>
-    <div>
-        <label>Materials (%):</label>
-        <input type="number" id="materials" placeholder="e.g., 60">
-    </div>
-    <div>
-        <label>Transportation Emissions (kg CO2):</label>
-        <input type="number" id="transport" placeholder="e.g., 100">
-    </div>
-    <div>
-        <label>Waste Generated (kg):</label>
-        <input type="number" id="waste" placeholder="e.g., 200">
+        <label>Supplier Location:</label>
+        <input type="text" id="supplier-location" placeholder="e.g., Mumbai, India">
     </div>
 
-    <button onclick="calculateScores()">Calculate & Save</button>
+    <!-- Quality (C1) -->
+    <div>
+        <label>Defect Rate (%):</label>
+        <input type="number" id="c11" placeholder="e.g., 3">
+    </div>
+    <div>
+        <label>Rejection Rate (%):</label>
+        <input type="number" id="c12" placeholder="e.g., 5">
+    </div>
 
+    <!-- Cost (C2) -->
+    <div>
+        <label>Product Cost (₹):</label>
+        <input type="number" id="c21" placeholder="e.g., 300000">
+    </div>
+    <div>
+        <label>Transportation Cost (₹):</label>
+        <input type="number" id="c22" placeholder="e.g., 8000">
+    </div>
+
+    <!-- Delivery (C3) -->
+    <div>
+        <label>Lead Time (Days):</label>
+        <input type="number" id="c31" placeholder="e.g., 15">
+    </div>
+    <div>
+        <label>Order Fulfillment Rate (%):</label>
+        <input type="number" id="c32" placeholder="e.g., 95">
+    </div>
+
+    <!-- Service (C4) -->
+    <div>
+        <label>Customer Service Rating (1-10):</label>
+        <input type="number" id="c41" min="1" max="10" placeholder="e.g., 8">
+    </div>
+    <div>
+        <label>CSR Contribution (%):</label>
+        <input type="number" id="c42" placeholder="e.g., 50">
+    </div>
+
+    <!-- Environmental Competency (C5) -->
+    <div>
+        <label>Emissions (Tons CO₂):</label>
+        <input type="number" id="c51" placeholder="e.g., 100">
+    </div>
+    <div>
+        <label>Number of Certifications:</label>
+        <input type="number" id="c52" placeholder="e.g., 3">
+    </div>
+    <div>
+        <label>Pollution Control Units:</label>
+        <input type="number" id="c53" placeholder="e.g., 30">
+    </div>
+
+    <button onclick="calculateVendorScore()">Calculate & Save</button>
+
+    <!-- Results Display -->
     <div id="results">
-        <h3>Results</h3>
-        <div id="eei-result" class="result-item"></div>
-        <div id="sss-result" class="result-item"></div>
-        <div id="final-result" class="result-item"></div>
+        <div class="result-item" id="total-score"></div>
+        <div class="result-item" id="c1-result"></div>
+        <div class="result-item" id="c2-result"></div>
+        <div class="result-item" id="c3-result"></div>
+        <div class="result-item" id="c4-result"></div>
+        <div class="result-item" id="c5-result"></div>
     </div>
 
     <script>
-        // Google Apps Script Web App URL
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0M3EOTiZjyugg7OlTb50ell1QYXDtbRRTIjnG6WIU3PH-DyMWQK4wOm6K23hA8wIG/exec';
+        function calculateVendorScore() {
+            // Get input values
+            const c11 = parseFloat(document.getElementById('c11').value);
+            const c12 = parseFloat(document.getElementById('c12').value);
+            const c21 = parseFloat(document.getElementById('c21').value);
+            const c22 = parseFloat(document.getElementById('c22').value);
+            const c31 = parseFloat(document.getElementById('c31').value);
+            const c32 = parseFloat(document.getElementById('c32').value);
+            const c41 = parseFloat(document.getElementById('c41').value);
+            const c42 = parseFloat(document.getElementById('c42').value);
+            const c51 = parseFloat(document.getElementById('c51').value);
+            const c52 = parseFloat(document.getElementById('c52').value);
+            const c53 = parseFloat(document.getElementById('c53').value);
 
-        async function saveDataToGoogleSheet(data) {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sheetName: 'SupplierData', // Change to your actual sheet name
-                        data: data
-                    })
-                });
+            // Calculate scores based on formulas
+            const c1_score = 1 + (c11 / 10) + 1 + (c12 / 10); // Quality (C1)
+            const c2_score = (1 + 9 * (c21 - 100000) / (500000 - 100000)) + (1 + 9 * (c22 - 5000) / (15000 - 5000)); // Cost (C2)
+            const c3_score = (1 + 9 * (c31 - 5) / (30 - 5)) + (11 - (c32 / 10)); // Delivery (C3)
+            const c4_score = 11 - c41 + 10 - (c42 / 10); // Service (C4)
+            const c5_score = (1 + 9 * (c51 - 50) / (200 - 50)) + (10 - (c52 * 2)) + (1 + 9 * (c53 - 10) / (100 - 10)); // Environmental Competency (C5)
 
-                const result = await response.json();
-                if (result.status === 'success') {
-                    alert('Data saved successfully!');
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            } catch (error) {
-                console.error('Error saving data:', error);
-                alert('There was an error saving the data.');
-            }
-        }
+            // Calculate total score
+            const total_score = c1_score + c2_score + c3_score + c4_score + c5_score;
 
-        function calculateScores() {
-            // Collect input values
-            const supplierName = document.getElementById('supplier-name').value.trim();
-            const energy = parseFloat(document.getElementById('energy').value) || 0;
-            const materials = parseFloat(document.getElementById('materials').value) || 0;
-            const transport = parseFloat(document.getElementById('transport').value) || 0;
-            const waste = parseFloat(document.getElementById('waste').value) || 0;
+            // Display results
+            document.getElementById('total-score').innerHTML = `Total Score: ${total_score.toFixed(2)}`;
+            document.getElementById('c1-result').innerHTML = `Quality Score (C1): ${c1_score.toFixed(2)}`;
+            document.getElementById('c2-result').innerHTML = `Cost Score (C2): ${c2_score.toFixed(2)}`;
+            document.getElementById('c3-result').innerHTML = `Delivery Score (C3): ${c3_score.toFixed(2)}`;
+            document.getElementById('c4-result').innerHTML = `Service Score (C4): ${c4_score.toFixed(2)}`;
+            document.getElementById('c5-result').innerHTML = `Environmental Competency Score (C5): ${c5_score.toFixed(2)}`;
 
-            // Validate inputs
-            if (!supplierName) {
-                alert('Please enter a supplier name.');
-                return;
-            }
+            // Determine Traffic Light Color
+            let color = 'red';
+            if (total_score <= 40) color = 'green';
+            else if (total_score <= 70) color = 'yellow';
 
-            // Calculate EEI and SSS
-            const eei = (energy * 0.4) + (materials * 0.3) + (transport * 0.2) + (waste * 0.1);
-            const sss = (energy + materials + transport + waste) / 4;
-
-            // Prepare data to save
-            const data = [
-                supplierName,
-                energy,
-                materials,
-                transport,
-                waste,
-                eei,
-                sss
-            ];
-
-            // Save data to Google Sheets using Google Apps Script
-            saveDataToGoogleSheet(data);
-
-            // Display Results
-            document.getElementById('eei-result').innerText = `EEI: ${eei.toFixed(2)}`;
-            document.getElementById('sss-result').innerText = `SSS: ${sss.toFixed(2)}`;
-            document.getElementById('final-result').innerText = `Final Score: ${(eei + sss) / 2}`;
+            // Add traffic light feedback
             document.getElementById('results').style.display = 'block';
+            document.getElementById('total-score').style.backgroundColor = color;
         }
     </script>
 </body>
