@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenScore - Vendor Selection Dashboard</title>
+    <title>Supplier Sustainability Calculator</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,73 +12,13 @@
             padding: 40px;
             color: #333;
         }
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .logo img {
-            width: 100px;
-        }
-        .header-text {
-            text-align: center;
-            flex-grow: 1;
-        }
+
         h1 {
             font-size: 2.5em;
             font-weight: bold;
             color: #2E7D32;
-            margin: 0;
         }
-        .tagline {
-            font-size: 1.1em;
-            color: #666;
-            margin-top: 5px;
-        }
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-        .tab-button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            border: none;
-            background: none;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        .tab-button.active {
-            color: #2E7D32;
-            border-bottom: 3px solid #2E7D32;
-        }
-        .section {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-        .section.active {
-            display: block;
-        }
-        h2 {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2E7D32;
-            margin-bottom: 20px;
-        }
-        h3 {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-        }
+
         label {
             display: block;
             font-size: 1em;
@@ -86,7 +26,8 @@
             color: #333;
             margin-bottom: 8px;
         }
-        select, input[type="text"], input[type="number"] {
+
+        input[type="number"], input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -95,12 +36,8 @@
             color: #333;
             background-color: #f9f9f9;
             margin-bottom: 15px;
-            box-sizing: border-box;
         }
-        input[type="checkbox"] {
-            margin-right: 10px;
-            accent-color: #2E7D32;
-        }
+
         button {
             background-color: #2E7D32;
             color: white;
@@ -114,152 +51,125 @@
             display: block;
             margin: 20px auto;
         }
+
         button:hover {
             background-color: #1B5E20;
         }
-        .results {
+
+        #results {
+            display: none;
             margin-top: 20px;
             padding: 20px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: none;
         }
-        .score-box {
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            color: white;
-            text-align: center;
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-        .green { background-color: #2E7D32; }
-        .yellow { background-color: #FBC02D; }
-        .red { background-color: #D32F2F; }
-        .error {
-            color: #D32F2F;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 1em;
-        }
-        .stars {
-            color: #FBC02D;
-            font-size: 1.2em;
-            margin-top: 10px;
+
+        .result-item {
+            margin-bottom: 10px;
         }
     </style>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            <img src="https://via.placeholder.com/100x40.png?text=Saivana+Garments" alt="Saivana Garments Pvt Ltd Logo">
-        </div>
-        <div class="header-text">
-            <h1>GreenScore</h1>
-            <div class="tagline">Rank vendors based on sustainability metrics</div>
-        </div>
-        <div style="width: 100px;"></div>
+    <h1>Supplier Sustainability Calculator</h1>
+
+    <div>
+        <label>Supplier Name:</label>
+        <input type="text" id="supplier-name" placeholder="e.g., Supplier A">
+    </div>
+    <div>
+        <label>Energy Consumption (kWh):</label>
+        <input type="number" id="energy" placeholder="e.g., 4000">
+    </div>
+    <div>
+        <label>Materials (%):</label>
+        <input type="number" id="materials" placeholder="e.g., 60">
+    </div>
+    <div>
+        <label>Transportation Emissions (kg CO2):</label>
+        <input type="number" id="transport" placeholder="e.g., 100">
+    </div>
+    <div>
+        <label>Waste Generated (kg):</label>
+        <input type="number" id="waste" placeholder="e.g., 200">
     </div>
 
-    <div class="tabs">
-        <button class="tab-button active" onclick="showTab('formal')">Formal Suppliers</button>
-        <button class="tab-button" onclick="showTab('informal')">Informal Suppliers (Artisans)</button>
-    </div>
+    <button onclick="calculateScores()">Calculate & Save</button>
 
-    <!-- Formal Suppliers Section -->
-    <div id="formal" class="section active">
-        <h2>Formal Suppliers</h2>
-        <div>
-            <label>Supplier Name:</label>
-            <input type="text" id="formal-supplier-name" placeholder="e.g., Supplier A">
-        </div>
-        <div>
-            <label>Supplier Location:</label>
-            <input type="text" id="formal-supplier-location" placeholder="e.g., Mumbai, India">
-        </div>
-        <div>
-            <label>Material Type:</label>
-            <select id="formal-material-type" onchange="updateFormalMaterialOptions()">
-                <option value="">-- Select Material Type --</option>
-                <option value="Fabric">Fabric</option>
-                <option value="Trims">Trims</option>
-            </select>
-        </div>
-        <div class="material-subcategory" id="formal-material-subcategory">
-            <label>Material Subcategory:</label>
-            <select id="formal-material-subcategory-select" onchange="updateFormalMaterialDetails()">
-                <option value="">-- Select Subcategory --</option>
-            </select>
-        </div>
-        <div class="material-detail" id="formal-material-detail">
-            <label>Material Detail:</label>
-            <select id="formal-material-detail-select">
-                <option value="">-- Select Material Detail --</option>
-            </select>
-        </div>
-        <div>
-            <h3>Quality (C1) - 18%</h3>
-            <label>Defect Rate (%):</label>
-            <input type="number" id="c11" min="0" max="100" step="0.1" placeholder="e.g., 3">
-            <label>Rejection Rate (%):</label>
-            <input type="number" id="c12" min="0" max="100" step="0.1" placeholder="e.g., 1">
-        </div>
-        <div>
-            <h3>Cost (C2) - 18%</h3>
-            <label>Product Cost (₹):</label>
-            <input type="number" id="c21" min="0" step="1" placeholder="e.g., 90000">
-            <label>Transportation Cost (₹):</label>
-            <input type="number" id="c22" min="0" step="1" placeholder="e.g., 8000">
-        </div>
-        <div>
-            <h3>Delivery (C3) - 14%</h3>
-            <label>Lead Time (days):</label>
-            <input type="number" id="c31" min="0" step="1" placeholder="e.g., 15">
-            <label>Order Fulfillment Rate (%):</label>
-            <input type="number" id="c32" min="0" max="100" step="0.1" placeholder="e.g., 95">
-        </div>
-        <div>
-            <h3>Service (C4) - 9%</h3>
-            <label>Customer Service Rating (1-10):</label>
-            <input type="number" id="c41" min="1" max="10" step="1" placeholder="e.g., 9">
-            <label>CSR Contribution (%):</label>
-            <input type="number" id="c42" min="0" max="100" step="0.1" placeholder="e.g., 70">
-        </div>
-        <div>
-            <h3>Environmental Competency (C5) - 31%</h3>
-            <label>Emissions (tons CO₂):</label>
-            <input type="number" id="c51" min="0" step="0.1" placeholder="e.g., 80">
-            <label>Certifications:</label>
-            <input type="checkbox" id="c52_gots"> GOTS (2%)<br>
-            <input type="checkbox" id="c52_higg_fem"> Higg FEM (1.4%)<br>
-            <input type="checkbox" id="c52_higg_fslm"> Higg FSLM (1.4%)<br>
-            <input type="checkbox" id="c52_zdhc"> ZDHC (1.05%)<br>
-            <input type="checkbox" id="c52_fair_trade"> Fair Trade (1%)<br>
-            <input type="checkbox" id="c52_bci"> BCI (0.35%)<br>
-            <input type="checkbox" id="c52_iso"> ISO 14001 (0.21%)<br>
-            <input type="checkbox" id="c52_ocs"> Organic Content Standard (0.14%)<br>
-            <input type="checkbox" id="c52_none"> No Certifications (0%)<br>
-            <label>Pollution Control Units:</label>
-            <input type="number" id="c53" min="0" step="0.1" placeholder="e.g., 30">
-            <label>Resource Consumption (units):</label>
-            <input type="number" id="c54" min="0" step="0.1" placeholder="e.g., 50">
-        </div>
-        <button onclick="calculateAndSaveFormal()">Calculate & Save</button>
-        <div id="formal-error" class="error"></div>
-        <div id="formal-results" class="results"></div>
+    <div id="results">
+        <h3>Results</h3>
+        <div id="eei-result" class="result-item"></div>
+        <div id="sss-result" class="result-item"></div>
+        <div id="final-result" class="result-item"></div>
     </div>
 
     <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+        // Google Apps Script Web App URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0M3EOTiZjyugg7OlTb50ell1QYXDtbRRTIjnG6WIU3PH-DyMWQK4wOm6K23hA8wIG/exec';
+
+        async function saveDataToGoogleSheet(data) {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sheetName: 'SupplierData', // Change to your actual sheet name
+                        data: data
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Data saved successfully!');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('There was an error saving the data.');
+            }
         }
 
-        // Add your calculation logic here for formal & informal calculations
+        function calculateScores() {
+            // Collect input values
+            const supplierName = document.getElementById('supplier-name').value.trim();
+            const energy = parseFloat(document.getElementById('energy').value) || 0;
+            const materials = parseFloat(document.getElementById('materials').value) || 0;
+            const transport = parseFloat(document.getElementById('transport').value) || 0;
+            const waste = parseFloat(document.getElementById('waste').value) || 0;
+
+            // Validate inputs
+            if (!supplierName) {
+                alert('Please enter a supplier name.');
+                return;
+            }
+
+            // Calculate EEI and SSS
+            const eei = (energy * 0.4) + (materials * 0.3) + (transport * 0.2) + (waste * 0.1);
+            const sss = (energy + materials + transport + waste) / 4;
+
+            // Prepare data to save
+            const data = [
+                supplierName,
+                energy,
+                materials,
+                transport,
+                waste,
+                eei,
+                sss
+            ];
+
+            // Save data to Google Sheets using Google Apps Script
+            saveDataToGoogleSheet(data);
+
+            // Display Results
+            document.getElementById('eei-result').innerText = `EEI: ${eei.toFixed(2)}`;
+            document.getElementById('sss-result').innerText = `SSS: ${sss.toFixed(2)}`;
+            document.getElementById('final-result').innerText = `Final Score: ${(eei + sss) / 2}`;
+            document.getElementById('results').style.display = 'block';
+        }
     </script>
 </body>
 </html>
