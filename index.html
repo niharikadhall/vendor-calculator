@@ -98,6 +98,41 @@
         <input type="text" id="supplier-location" placeholder="e.g., Mumbai, India">
     </div>
 
+    <!-- Choose Material Type (Fabric or Trim) -->
+    <div>
+        <label>Material Type:</label>
+        <select id="material-type" onchange="updateMaterialOptions()">
+            <option value="">-- Select Material Type --</option>
+            <option value="Fabric">Fabric</option>
+            <option value="Trim">Trim</option>
+        </select>
+    </div>
+
+    <!-- Fabric Options -->
+    <div id="fabric-options" style="display: none;">
+        <label>Choose Fabric Type:</label>
+        <select id="fabric-type">
+            <option value="">-- Select Fabric Type --</option>
+            <option value="Cotton">Cotton</option>
+            <option value="Linen">Linen</option>
+            <option value="Silk">Silk</option>
+            <option value="Wool">Wool</option>
+            <option value="Polyester">Polyester</option>
+        </select>
+    </div>
+
+    <!-- Trim Options -->
+    <div id="trim-options" style="display: none;">
+        <label>Choose Trim Type:</label>
+        <select id="trim-type">
+            <option value="">-- Select Trim Type --</option>
+            <option value="Buttons">Buttons</option>
+            <option value="Zippers">Zippers</option>
+            <option value="Laces">Laces</option>
+            <option value="Labels">Labels</option>
+        </select>
+    </div>
+
     <!-- Quality (C1) -->
     <div>
         <label>Defect Rate (%):</label>
@@ -165,6 +200,20 @@
     </div>
 
     <script>
+        function updateMaterialOptions() {
+            const materialType = document.getElementById('material-type').value;
+            if (materialType === "Fabric") {
+                document.getElementById('fabric-options').style.display = 'block';
+                document.getElementById('trim-options').style.display = 'none';
+            } else if (materialType === "Trim") {
+                document.getElementById('trim-options').style.display = 'block';
+                document.getElementById('fabric-options').style.display = 'none';
+            } else {
+                document.getElementById('fabric-options').style.display = 'none';
+                document.getElementById('trim-options').style.display = 'none';
+            }
+        }
+
         function calculateVendorScore() {
             // Get input values
             const c11 = parseFloat(document.getElementById('c11').value);
@@ -197,14 +246,8 @@
             document.getElementById('c4-result').innerHTML = `Service Score (C4): ${c4_score.toFixed(2)}`;
             document.getElementById('c5-result').innerHTML = `Environmental Competency Score (C5): ${c5_score.toFixed(2)}`;
 
-            // Determine Traffic Light Color
-            let color = 'red';
-            if (total_score <= 40) color = 'green';
-            else if (total_score <= 70) color = 'yellow';
-
-            // Add traffic light feedback
+            // Show results
             document.getElementById('results').style.display = 'block';
-            document.getElementById('total-score').style.backgroundColor = color;
         }
     </script>
 </body>
