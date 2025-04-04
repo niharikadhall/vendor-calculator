@@ -415,19 +415,44 @@
             }
         }
 
+        // Send Data to Google Sheets
+        async function sendDataToServer(data) {
+            console.log('Sending data to Google Sheets:', data);
+            try {
+                const response = await fetch('YOUR_WEB_APP_URL_HERE', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    mode: 'no-cors' // Required for GitHub Pages
+                });
+                console.log('Data sent successfully to Google Sheets');
+            } catch (error) {
+                console.error('Error sending data:', error);
+                alert('Failed to save data to Google Sheets: ' + error.message);
+            }
+        }
+
         // Formal Score Calculation
         function calculateFormalScore() {
-            const defectRate = parseFloat(document.getElementById('formalDefectRate').value) || 0;
-            const rejectionRate = parseFloat(document.getElementById('formalRejectionRate').value) || 0;
-            const productCost = parseFloat(document.getElementById('formalProductCost').value) || 0;
-            const transportCost = parseFloat(document.getElementById('formalTransportCost').value) || 0;
-            const leadTime = parseFloat(document.getElementById('formalLeadTime').value) || 0;
-            const fulfillmentRate = parseFloat(document.getElementById('formalFulfillmentRate').value) || 0;
-            const customerService = parseFloat(document.getElementById('formalCustomerService').value) || 0;
-            const csr = parseFloat(document.getElementById('formalCsr').value) || 0;
-            const emissions = parseFloat(document.getElementById('formalEmissions').value) || 0;
-            const selectedCertifications = Array.from(document.querySelectorAll('input[name="formalCertifications"]:checked')).map(input => input.value);
-            const selectedPractices = Array.from(document.querySelectorAll('input[name="formalPractices"]:checked')).map(input => input.value);
+            console.log('calculateFormalScore triggered');
+            const data = {
+                supplierName: document.getElementById('formalSupplierName').value || '',
+                supplierLocation: document.getElementById('formalSupplierLocation').value || '',
+                supplierType: document.getElementById('formalSupplierType').value || '',
+                subType: document.getElementById('formalSubType').value || '',
+                defectRate: parseFloat(document.getElementById('formalDefectRate').value) || 0,
+                rejectionRate: parseFloat(document.getElementById('formalRejectionRate').value) || 0,
+                productCost: parseFloat(document.getElementById('formalProductCost').value) || 0,
+                transportCost: parseFloat(document.getElementById('formalTransportCost').value) || 0,
+                leadTime: parseFloat(document.getElementById('formalLeadTime').value) || 0,
+                fulfillmentRate: parseFloat(document.getElementById('formalFulfillmentRate').value) || 0,
+                customerService: parseFloat(document.getElementById('formalCustomerService').value) || 0,
+                csr: parseFloat(document.getElementById('formalCsr').value) || 0,
+                emissions: parseFloat(document.getElementById('formalEmissions').value) || 0,
+                certifications: Array.from(document.querySelectorAll('input[name="formalCertifications"]:checked')).map(input => input.value),
+                practices: Array.from(document.querySelectorAll('input[name="formalPractices"]:checked')).map(input => input.value),
+                timestamp: new Date().toISOString()
+            };
 
             const minMax = {
                 productCost: { min: 1000, max: 50000 },
@@ -436,15 +461,15 @@
                 emissions: { min: 10, max: 500 }
             };
 
-            const c1Raw = (Math.min(10, Math.round(1 + (defectRate / 10))) + Math.min(10, Math.round(1 + (rejectionRate / 10)))) / 2;
-            const c2Raw = (Math.min(10, Math.round(1 + 9 * ((productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min)))) + 
-                           Math.min(10, Math.round(1 + 9 * ((transportCost - minMax.transportCost.min) / (minMax.transportCost.max - minMax.transportCost.min))))) / 2;
-            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
-                           Math.round(11 - (fulfillmentRate / 10))) / 2;
-            const c4Raw = (Math.round(11 - customerService) + Math.min(10, Math.round(10 - (csr / 10)))) / 2;
-            const c51 = Math.min(10, Math.round(1 + 9 * ((emissions - minMax.emissions.min) / (minMax.emissions.max - minMax.emissions.min))));
-            const c52 = selectedCertifications.includes('No Certifications') || selectedCertifications.length === 0 ? 10 : Math.max(1, 10 - selectedCertifications.reduce((sum, cert) => sum + (formalCertificationWeights[cert] || 0), 0));
-            const c53 = selectedPractices.includes('None') || selectedPractices.length === 0 ? 10 : Math.max(1, 10 - selectedPractices.reduce((sum, practice) => sum + (formalPracticeWeights[practice] || 0), 0));
+            const c1Raw = (Math.min(10, Math.round(1 + (data.defectRate / 10))) + Math.min(10, Math.round(1 + (data.rejectionRate / 10)))) / 2;
+            const c2Raw = (Math.min(10, Math.round(1 + 9 * ((data.productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min)))) + 
+                           Math.min(10, Math.round(1 + 9 * ((data.transportCost - minMax.transportCost.min) / (minMax.transportCost.max - minMax.transportCost.min))))) / 2;
+            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((data.leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
+                           Math.round(11 - (data.fulfillmentRate / 10))) / 2;
+            const c4Raw = (Math.round(11 - data.customerService) + Math.min(10, Math.round(10 - (data.csr / 10)))) / 2;
+            const c51 = Math.min(10, Math.round(1 + 9 * ((data.emissions - minMax.emissions.min) / (minMax.emissions.max - minMax.emissions.min))));
+            const c52 = data.certifications.includes('No Certifications') || data.certifications.length === 0 ? 10 : Math.max(1, 10 - data.certifications.reduce((sum, cert) => sum + (formalCertificationWeights[cert] || 0), 0));
+            const c53 = data.practices.includes('None') || data.practices.length === 0 ? 10 : Math.max(1, 10 - data.practices.reduce((sum, practice) => sum + (formalPracticeWeights[practice] || 0), 0));
             const c5Raw = (c51 + c52 + c53) / 3;
 
             const totalScoreRaw = (c1Raw * formalCriteriaWeights.c1) + (c2Raw * formalCriteriaWeights.c2) + (c3Raw * formalCriteriaWeights.c3) + (c4Raw * formalCriteriaWeights.c4) + (c5Raw * formalCriteriaWeights.c5);
@@ -466,32 +491,45 @@
             resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
             resultDiv.className = 'result ' + colorClass;
             resultDiv.style.display = 'block';
+
+            // Add calculated fields to data object and send to Google Sheets
+            data.totalScore = totalScore.toFixed(2);
+            data.assessment = assessment;
+            sendDataToServer(data);
         }
 
         // Informal Score Calculation
         function calculateInformalScore() {
-            const craftQuality = parseFloat(document.getElementById('informalCraftQuality').value) || 0;
-            const consistency = parseFloat(document.getElementById('informalConsistency').value) || 0;
-            const productCost = parseFloat(document.getElementById('informalProductCost').value) || 0;
-            const leadTime = parseFloat(document.getElementById('informalLeadTime').value) || 0;
-            const reliability = parseFloat(document.getElementById('informalReliability').value) || 0;
-            const communitySupport = parseFloat(document.getElementById('informalCommunitySupport').value) || 0;
-            const employment = parseFloat(document.getElementById('informalEmployment').value) || 0;
-            const materialSource = parseFloat(document.getElementById('informalMaterialSource').value) || 0;
-            const selectedPractices = Array.from(document.querySelectorAll('input[name="informalPractices"]:checked')).map(input => input.value);
+            console.log('calculateInformalScore triggered');
+            const data = {
+                supplierName: document.getElementById('informalSupplierName').value || '',
+                supplierLocation: document.getElementById('informalSupplierLocation').value || '',
+                supplierType: document.getElementById('informalSupplierType').value || '',
+                subType: document.getElementById('informalSubType').value || '',
+                craftQuality: parseFloat(document.getElementById('informalCraftQuality').value) || 0,
+                consistency: parseFloat(document.getElementById('informalConsistency').value) || 0,
+                productCost: parseFloat(document.getElementById('informalProductCost').value) || 0,
+                leadTime: parseFloat(document.getElementById('informalLeadTime').value) || 0,
+                reliability: parseFloat(document.getElementById('informalReliability').value) || 0,
+                communitySupport: parseFloat(document.getElementById('informalCommunitySupport').value) || 0,
+                employment: parseFloat(document.getElementById('informalEmployment').value) || 0,
+                materialSource: parseFloat(document.getElementById('informalMaterialSource').value) || 0,
+                practices: Array.from(document.querySelectorAll('input[name="informalPractices"]:checked')).map(input => input.value),
+                timestamp: new Date().toISOString()
+            };
 
             const minMax = {
                 productCost: { min: 100, max: 5000 },
                 leadTime: { min: 1, max: 30 }
             };
 
-            const c1Raw = (Math.round(11 - craftQuality) + Math.round(11 - consistency)) / 2;
-            const c2Raw = Math.min(10, Math.round(1 + 9 * ((productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min))));
-            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
-                           Math.round(11 - reliability)) / 2;
-            const c4Raw = (Math.round(11 - communitySupport) + Math.round(11 - employment)) / 2;
-            const c51 = Math.round(11 - materialSource);
-            const c52 = selectedPractices.includes('None') || selectedPractices.length === 0 ? 10 : Math.max(1, 10 - selectedPractices.reduce((sum, practice) => sum + (informalPracticeWeights[practice] || 0), 0));
+            const c1Raw = (Math.round(11 - data.craftQuality) + Math.round(11 - data.consistency)) / 2;
+            const c2Raw = Math.min(10, Math.round(1 + 9 * ((data.productCost - minMax.productCost.min) / (minMax.productCost.max - minMax.productCost.min))));
+            const c3Raw = (Math.min(10, Math.round(1 + 9 * ((data.leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
+                           Math.round(11 - data.reliability)) / 2;
+            const c4Raw = (Math.round(11 - data.communitySupport) + Math.round(11 - data.employment)) / 2;
+            const c51 = Math.round(11 - data.materialSource);
+            const c52 = data.practices.includes('None') || data.practices.length === 0 ? 10 : Math.max(1, 10 - data.practices.reduce((sum, practice) => sum + (informalPracticeWeights[practice] || 0), 0));
             const c5Raw = (c51 + c52) / 2;
 
             const totalScoreRaw = (c1Raw * informalCriteriaWeights.c1) + (c2Raw * informalCriteriaWeights.c2) + (c3Raw * informalCriteriaWeights.c3) + (c4Raw * informalCriteriaWeights.c4) + (c5Raw * informalCriteriaWeights.c5);
@@ -513,6 +551,11 @@
             resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
             resultDiv.className = 'result ' + colorClass;
             resultDiv.style.display = 'block';
+
+            // Add calculated fields to data object and send to Google Sheets
+            data.totalScore = totalScore.toFixed(2);
+            data.assessment = assessment;
+            sendDataToServer(data);
         }
 
         // Reset Functions
