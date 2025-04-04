@@ -419,7 +419,7 @@
         async function sendDataToServer(data) {
             console.log('Sending data to Google Sheets:', data);
             try {
-                const response = await fetch('YOUR_WEB_APP_URL_HERE', {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbzMslW1WPd_PY8N8hqqCb8-40XLa2VveSP0KU4YpM9K0Mz1ToZhLPRfH1kXNGILUKBWNA/exec', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
