@@ -210,8 +210,55 @@
 
             <h3>Environmental Competency (C5) <span class="weightage">Weight: 20%</span></h3>
             <div class="form-group">
-                <label for="formalEmissions">CO₂ Emissions (Tons):</label>
-                <input type="number" id="formalEmissions" min="0" step="0.1">
+                <label for="fabricType">Fabric Type:</label>
+                <select id="fabricType">
+                    <option value="cotton">Conventional Cotton (~5.9 kg CO₂e/kg)</option>
+                    <option value="organic_cotton">Organic Cotton (~3.0 kg CO₂e/kg)</option>
+                    <option value="polyester">Polyester (~11.0 kg CO₂e/kg)</option>
+                    <option value="silk">Silk (~9.5 kg CO₂e/kg)</option>
+                    <option value="wool">Wool (~23.0 kg CO₂e/kg)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fabricWeight">Fabric Weight (kg):</label>
+                <input type="number" id="fabricWeight" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="transportMode">Transport Mode:</label>
+                <select id="transportMode">
+                    <option value="truck">Truck (0.15 kg CO₂e/km/ton)</option>
+                    <option value="ship">Ship (0.035 kg CO₂e/km/ton)</option>
+                    <option value="air">Air (1.5 kg CO₂e/km/ton)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="distance">Transport Distance (km):</label>
+                <input type="number" id="distance" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="fuelType">Fuel Type:</label>
+                <select id="fuelType">
+                    <option value="none">None</option>
+                    <option value="diesel">Diesel (~2.68 kg CO₂e/l)</option>
+                    <option value="coal">Coal (~2.86 kg CO₂e/kg)</option>
+                    <option value="natural_gas">Natural Gas (~2.75 kg CO₂e/m³)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fuelAmount">Fuel Amount:</label>
+                <input type="number" id="fuelAmount" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="electricity">Electricity Used (kWh):</label>
+                <input type="number" id="electricity" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="region">Electricity Grid Region:</label>
+                <select id="region">
+                    <option value="india">India (~0.82 kg CO₂e/kWh)</option>
+                    <option value="us">USA (~0.4 kg CO₂e/kWh)</option>
+                    <option value="eu">EU (~0.25 kg CO₂e/kWh)</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Certifications:</label>
@@ -309,8 +356,26 @@
 
             <h3>Environmental Sustainability (C5) <span class="weightage">Weight: 15%</span></h3>
             <div class="form-group">
-                <label for="informalMaterialSource">Material Source Sustainability (1-10):</label>
-                <input type="number" id="informalMaterialSource" min="1" max="10" step="1">
+                <label for="informalFabricType">Material Type:</label>
+                <select id="informalFabricType">
+                    <option value="cotton">Conventional Cotton (~5.9 kg CO₂e/kg)</option>
+                    <option value="organic_cotton">Organic Cotton (~3.0 kg CO₂e/kg)</option>
+                    <option value="polyester">Polyester (~11.0 kg CO₂e/kg)</option>
+                    <option value="silk">Silk (~9.5 kg CO₂e/kg)</option>
+                    <option value="wool">Wool (~23.0 kg CO₂e/kg)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="informalFabricWeight">Material Weight (kg):</label>
+                <input type="number" id="informalFabricWeight" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="informalTransportMode">Transport Mode:</label>
+                <select id="informalTransportMode">
+                    <option value="truck">Truck (0.15 kg CO₂e/km/ton)</option>
+                    <option value="ship">Ship (0.035 kg CO₂e/km/ton)</option>
+                    <option value="air">Air (1.5 kg CO₂e/km/ton)</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Sustainable Practices:</label>
@@ -362,6 +427,31 @@
             c1: 0.30, c2: 0.20, c3: 0.20, c4: 0.15, c5: 0.15
         };
 
+        // Carbon Footprint Factors
+        const fabricFactors = {
+            cotton: 5.9,
+            organic_cotton: 3.0,
+            polyester: 11.0,
+            silk: 9.5,
+            wool: 23.0
+        };
+        const transportFactors = {
+            truck: 0.15,
+            ship: 0.035,
+            air: 1.5
+        };
+        const fuelFactors = {
+            diesel: 2.68,
+            coal: 2.86,
+            natural_gas: 2.75,
+            none: 0
+        };
+        const electricityFactors = {
+            india: 0.82,
+            us: 0.4,
+            eu: 0.25
+        };
+
         // Tab Functionality
         function openTab(evt, tabName) {
             const tabcontent = document.getElementsByClassName("tabcontent");
@@ -375,7 +465,7 @@
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-        document.getElementById("defaultOpen").click(); // Open Formal tab by default
+        document.getElementById("defaultOpen").click();
 
         // Toggle Sub-Types
         function toggleFormalSubType() {
@@ -423,7 +513,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
-                    mode: 'no-cors' // Required for GitHub Pages
+                    mode: 'no-cors'
                 });
                 console.log('Data sent successfully to Google Sheets');
             } catch (error) {
@@ -448,7 +538,14 @@
                 fulfillmentRate: parseFloat(document.getElementById('formalFulfillmentRate').value) || 0,
                 customerService: parseFloat(document.getElementById('formalCustomerService').value) || 0,
                 csr: parseFloat(document.getElementById('formalCsr').value) || 0,
-                emissions: parseFloat(document.getElementById('formalEmissions').value) || 0,
+                fabricType: document.getElementById('fabricType').value || '',
+                fabricWeight: parseFloat(document.getElementById('fabricWeight').value) || 0,
+                transportMode: document.getElementById('transportMode').value || '',
+                distance: parseFloat(document.getElementById('distance').value) || 0,
+                fuelType: document.getElementById('fuelType').value || '',
+                fuelAmount: parseFloat(document.getElementById('fuelAmount').value) || 0,
+                electricity: parseFloat(document.getElementById('electricity').value) || 0,
+                region: document.getElementById('region').value || '',
                 certifications: Array.from(document.querySelectorAll('input[name="formalCertifications"]:checked')).map(input => input.value),
                 practices: Array.from(document.querySelectorAll('input[name="formalPractices"]:checked')).map(input => input.value),
                 timestamp: new Date().toISOString()
@@ -457,8 +554,7 @@
             const minMax = {
                 productCost: { min: 1000, max: 50000 },
                 transportCost: { min: 500, max: 20000 },
-                leadTime: { min: 5, max: 60 },
-                emissions: { min: 10, max: 500 }
+                leadTime: { min: 5, max: 60 }
             };
 
             const c1Raw = (Math.min(10, Math.round(1 + (data.defectRate / 10))) + Math.min(10, Math.round(1 + (data.rejectionRate / 10)))) / 2;
@@ -467,7 +563,14 @@
             const c3Raw = (Math.min(10, Math.round(1 + 9 * ((data.leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
                            Math.round(11 - (data.fulfillmentRate / 10))) / 2;
             const c4Raw = (Math.round(11 - data.customerService) + Math.min(10, Math.round(10 - (data.csr / 10)))) / 2;
-            const c51 = Math.min(10, Math.round(1 + 9 * ((data.emissions - minMax.emissions.min) / (minMax.emissions.max - minMax.emissions.min))));
+
+            // Carbon Footprint Calculation for C5
+            const fabricEmissions = data.fabricWeight * fabricFactors[data.fabricType];
+            const transportEmissions = (data.fabricWeight / 1000) * data.distance * transportFactors[data.transportMode];
+            const fuelEmissions = data.fuelAmount * fuelFactors[data.fuelType];
+            const electricityEmissions = data.electricity * electricityFactors[data.region];
+            const totalEmissions = fabricEmissions + transportEmissions + fuelEmissions + electricityEmissions;
+            const c51 = Math.min(10, Math.round(1 + 9 * (totalEmissions / 500))); // Scale emissions to 1-10 (max 500 kg)
             const c52 = data.certifications.includes('No Certifications') || data.certifications.length === 0 ? 10 : Math.max(1, 10 - data.certifications.reduce((sum, cert) => sum + (formalCertificationWeights[cert] || 0), 0));
             const c53 = data.practices.includes('None') || data.practices.length === 0 ? 10 : Math.max(1, 10 - data.practices.reduce((sum, practice) => sum + (formalPracticeWeights[practice] || 0), 0));
             const c5Raw = (c51 + c52 + c53) / 3;
@@ -488,13 +591,13 @@
                 assessment = 'Poor Supplier - Not Recommended';
             }
 
-            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
+            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}<br>Total CO₂ Emissions: ${totalEmissions.toFixed(2)} kg`;
             resultDiv.className = 'result ' + colorClass;
             resultDiv.style.display = 'block';
 
-            // Add calculated fields to data object and send to Google Sheets
             data.totalScore = totalScore.toFixed(2);
             data.assessment = assessment;
+            data.totalEmissions = totalEmissions.toFixed(2);
             sendDataToServer(data);
         }
 
@@ -513,7 +616,9 @@
                 reliability: parseFloat(document.getElementById('informalReliability').value) || 0,
                 communitySupport: parseFloat(document.getElementById('informalCommunitySupport').value) || 0,
                 employment: parseFloat(document.getElementById('informalEmployment').value) || 0,
-                materialSource: parseFloat(document.getElementById('informalMaterialSource').value) || 0,
+                fabricType: document.getElementById('informalFabricType').value || '',
+                fabricWeight: parseFloat(document.getElementById('informalFabricWeight').value) || 0,
+                transportMode: document.getElementById('informalTransportMode').value || '',
                 practices: Array.from(document.querySelectorAll('input[name="informalPractices"]:checked')).map(input => input.value),
                 timestamp: new Date().toISOString()
             };
@@ -528,7 +633,12 @@
             const c3Raw = (Math.min(10, Math.round(1 + 9 * ((data.leadTime - minMax.leadTime.min) / (minMax.leadTime.max - minMax.leadTime.min)))) + 
                            Math.round(11 - data.reliability)) / 2;
             const c4Raw = (Math.round(11 - data.communitySupport) + Math.round(11 - data.employment)) / 2;
-            const c51 = Math.round(11 - data.materialSource);
+
+            // Simplified Carbon Footprint for C5
+            const fabricEmissions = data.fabricWeight * fabricFactors[data.fabricType];
+            const transportEmissions = (data.fabricWeight / 1000) * data.leadTime * transportFactors[data.transportMode]; // Using leadTime as proxy for distance
+            const totalEmissions = fabricEmissions + transportEmissions;
+            const c51 = Math.min(10, Math.round(1 + 9 * (totalEmissions / 100))); // Scale to 1-10 (max 100 kg)
             const c52 = data.practices.includes('None') || data.practices.length === 0 ? 10 : Math.max(1, 10 - data.practices.reduce((sum, practice) => sum + (informalPracticeWeights[practice] || 0), 0));
             const c5Raw = (c51 + c52) / 2;
 
@@ -548,13 +658,13 @@
                 assessment = 'Poor Artisan - Not Recommended';
             }
 
-            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}`;
+            resultDiv.innerHTML = `<strong>Total Score: ${totalScore.toFixed(2)}</strong><br>${assessment}<br>Total CO₂ Emissions: ${totalEmissions.toFixed(2)} kg`;
             resultDiv.className = 'result ' + colorClass;
             resultDiv.style.display = 'block';
 
-            // Add calculated fields to data object and send to Google Sheets
             data.totalScore = totalScore.toFixed(2);
             data.assessment = assessment;
+            data.totalEmissions = totalEmissions.toFixed(2);
             sendDataToServer(data);
         }
 
