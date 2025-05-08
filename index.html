@@ -413,7 +413,7 @@
         // Informal Types
         const weavingTypes = ['Handloom', 'Powerloom', 'Knitting', 'Crochet'];
         const embroideryTypes = ['Hand Embroidery', 'Machine Embroidery', 'Appliqué', 'Cross-Stitch'];
-        const potteryTypes = ['Earthenware', 'Stoneware', 'Porcelain'];
+        const knittingTypes = ['Finger Knitting', 'Circular Knitting'];
 
         // Formal Weightages
         const formalCertificationWeights = {
@@ -506,8 +506,8 @@
             } else if (supplierType === 'embroidery') {
                 embroideryTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
                 subTypeContainer.style.display = 'block';
-            } else if (supplierType === 'pottery') {
-                potteryTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
+            } else if (supplierType === 'knitting') {
+                knittingTypes.forEach(type => subTypeSelect.innerHTML += `<option value="${type}">${type}</option>`);
                 subTypeContainer.style.display = 'block';
             } else {
                 subTypeContainer.style.display = 'none';
